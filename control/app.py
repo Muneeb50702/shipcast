@@ -166,10 +166,13 @@ PLATFORMS = {
                  "under Facebook Login settings. Other people's accounts need Meta App Review."),
     "threads": ("Threads", ["THREADS_APP_ID", "THREADS_APP_SECRET"], [], "https://developers.facebook.com/apps",
                 ["threads"], "Meta app with the 'Access the Threads API' use case; use the Threads app ID/secret."),
-    "linkedin": ("LinkedIn (profiles + pages)", ["LINKEDIN_CLIENT_ID", "LINKEDIN_CLIENT_SECRET"], [],
-                 "https://www.linkedin.com/developers/apps", ["linkedin", "linkedin-page"],
-                 "Products: Share on LinkedIn + Sign In with LinkedIn (OpenID Connect); Community Management API "
-                 "for company pages."),
+    "linkedin": ("LinkedIn (personal profiles)", ["LINKEDIN_CLIENT_ID", "LINKEDIN_CLIENT_SECRET"], [],
+                 "https://www.linkedin.com/developers/apps", ["linkedin"],
+                 "App with products Sign In with LinkedIn using OpenID Connect + Share on LinkedIn (both instant)."),
+    "linkedin-page": ("LinkedIn (company pages)", ["LINKEDIN_PAGE_CLIENT_ID", "LINKEDIN_PAGE_CLIENT_SECRET"], [],
+                      "https://www.linkedin.com/developers/apps", ["linkedin-page"],
+                      "A second app with ONLY the Community Management API (LinkedIn requires it alone; access needs "
+                      "LinkedIn's approval and a verified company page)."),
     "tiktok": ("TikTok", ["TIKTOK_CLIENT_ID", "TIKTOK_CLIENT_SECRET"], [], "https://developers.tiktok.com/apps",
                ["tiktok"], "App with Login Kit + Content Posting API (direct post). Public use needs TikTok's review."),
     "tiktok-business": ("TikTok Business", ["TIKTOK_BUSINESS_CLIENT_ID", "TIKTOK_BUSINESS_CLIENT_SECRET"], [],

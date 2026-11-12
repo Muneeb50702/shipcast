@@ -5,6 +5,7 @@
 // 3. Agent page (upstream chat that needs an OpenAI key) shows Shipcast Control (/control/, same site and login) in
 //    an iframe; its menu item becomes "Claude".
 // 4. Every link to the upstream product's own sites is neutralised and hidden (see UPSTREAM below + brand.css).
+// 5. Backend: LinkedIn profiles and company pages use separate LinkedIn apps (see the end of this file).
 // Every patch must hit, or the build fails (so an upstream update can't silently drop it).
 const fs = require("fs"), path = require("path");
 
@@ -157,6 +158,35 @@ for (const p of PATCHES) {
   if (!hits[p.name][p.where]) throw new Error(`patch "${p.name}" found nothing in ${p.where} files`);
 }
 for (const [t, n] of Object.entries(textHits)) if (!n) throw new Error(`text not found in static files: ${t}`);
+
+// ---- 5. backend: LinkedIn split. LinkedIn now requires the Community Management API (company pages) to be the only
+// product on its app, so one app can no longer grant everything upstream asks for. Personal profiles use the
+// OpenID + Share on LinkedIn app (LINKEDIN_CLIENT_ID); pages use a separate Community Management app
+// (LINKEDIN_PAGE_CLIENT_ID, falling back to LINKEDIN_CLIENT_ID), which has no openid/profile, so /v2/me replaces
+// /v2/userinfo there. Patched in both the API server and the orchestrator (publishing worker).
+const LI_ALL = /this\.scopes = \[\s*'openid',\s*'profile',\s*'w_member_social',\s*'r_basicprofile',\s*'rw_organization_admin',\s*'w_organization_social',\s*'r_organization_social',?\s*\]/g;
+const BACKEND_PATCHES = [
+  { file: "linkedin.provider.js", re: LI_ALL, n: 1, to: "this.scopes = ['openid', 'profile', 'w_member_social']" },
+  { file: "linkedin.page.provider.js", re: LI_ALL, n: 1,
+    to: "this.scopes = ['r_basicprofile', 'w_member_social', 'rw_organization_admin', 'w_organization_social', 'r_organization_social']" },
+  { file: "linkedin.page.provider.js", re: /process\.env\.LINKEDIN_CLIENT_ID/g, n: 3,
+    to: "(process.env.LINKEDIN_PAGE_CLIENT_ID || process.env.LINKEDIN_CLIENT_ID)" },
+  { file: "linkedin.page.provider.js", re: /process\.env\.LINKEDIN_CLIENT_SECRET/g, n: 2,
+    to: "(process.env.LINKEDIN_PAGE_CLIENT_SECRET || process.env.LINKEDIN_CLIENT_SECRET)" },
+  { file: "linkedin.page.provider.js", n: 2,
+    re: /const \{\s*name,\s*sub: id,\s*picture,\s*\} = await \(await fetch\('https:\/\/api\.linkedin\.com\/v2\/userinfo'/g,
+    to: "const { localizedFirstName: name, id, picture, } = await (await fetch('https://api.linkedin.com/v2/me'" },
+];
+for (const app of ["backend", "orchestrator"]) {
+  const dir = `/app/apps/${app}/dist/libraries/nestjs-libraries/src/integrations/social/`;
+  for (const p of BACKEND_PATCHES) {
+    let hits = 0;
+    const out = fs.readFileSync(dir + p.file, "utf8").replace(p.re, () => { hits++; return p.to; });
+    if (hits !== p.n) throw new Error(`${app}/${p.file}: expected ${p.n} match(es) of ${p.re}, got ${hits}`);
+    fs.writeFileSync(dir + p.file, out);
+  }
+}
+console.log("backend: linkedin split patched in backend + orchestrator");
 const anyUpstream = new RegExp(UPSTREAM.source);  // no /g: .test() must not carry lastIndex between files
 const linked = files.filter(f => !f.endsWith(".map") && anyUpstream.test(fs.readFileSync(f, "utf8")));
 if (!unlinked || linked.length) throw new Error("upstream links left in " + linked.join(", "));
