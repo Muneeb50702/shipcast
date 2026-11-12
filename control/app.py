@@ -763,6 +763,88 @@ async def platforms_page(req: Request, user: dict):
     return page("Platforms", note + "".join(cards), user, "/platforms", flash)
 
 
+# ------------------------------------------------------------------ public legal pages (no login)
+
+CONTACT = os.environ.get("CONTACT_EMAIL", "")  # set on the server (systemd drop-in), not in the repo
+LEGAL_DATE = "12 November 2026"
+
+
+def contact_line() -> str:
+    return (f'email <a href="mailto:{e(CONTACT)}">{e(CONTACT)}</a>' if CONTACT
+            else "use the contact options inside Shipcast")
+
+
+@mcp.custom_route("/privacy", methods=["GET"])
+async def privacy(req: Request):
+    return page("Privacy Policy", f"""<div class=card>
+<p class=mute>Effective {LEGAL_DATE}. Shipcast ({e(STUDIO)}) is a social media scheduling and management platform.
+This policy explains what we collect, why, and the choices you have.</p>
+<h2>What we collect</h2><ul>
+<li><b>Account data:</b> your email address, name and password (stored hashed) when you sign up.</li>
+<li><b>Your content:</b> posts, media, schedules, brand profile and style kits you create in your workspace.</li>
+<li><b>Connected platforms:</b> when you connect a social account (for example YouTube, Facebook, Instagram,
+LinkedIn, TikTok), we receive access tokens and basic profile details (name, picture, account or channel ID)
+from that platform, and the data needed to publish your posts and show your statistics.</li>
+<li><b>Connected AI apps:</b> if you connect an AI assistant such as Claude, it can use your workspace through
+the tools you approve; we record which apps you connected and when they were last used.</li>
+<li><b>Technical data:</b> server logs (IP address, browser, errors) kept for security and reliability.</li></ul>
+<h2>How we use it</h2>
+<p>Only to provide the features you ask for: storing your content, publishing or scheduling it to the accounts
+you connect, showing analytics, and keeping the service secure. We do not sell your data, do not use it for
+advertising, and do not use it to train AI models.</p>
+<h2>Google and YouTube data</h2>
+<p>Shipcast uses YouTube API Services. When you connect YouTube we access your channel details, upload and manage
+the videos you schedule, and read your channel statistics. Shipcast's use and transfer to any other app of
+information received from Google APIs will adhere to the
+<a href="https://developers.google.com/terms/api-services-user-data-policy" target=_blank>Google API Services User
+Data Policy</a>, including the Limited Use requirements. By connecting YouTube you agree to the
+<a href="https://www.youtube.com/t/terms" target=_blank>YouTube Terms of Service</a>; see also the
+<a href="https://policies.google.com/privacy" target=_blank>Google Privacy Policy</a>. You can revoke Shipcast's
+access at any time at <a href="https://myaccount.google.com/permissions" target=_blank>Google security settings</a>.</p>
+<h2>Sharing</h2>
+<p>Your content goes to the platforms you choose to post to. We use service providers to run Shipcast (our own
+servers and Cloudflare for secure connections); they process data only to provide that service. We may disclose
+data if required by law.</p>
+<h2>Storage, security and retention</h2>
+<p>Data is stored on our servers and sent over encrypted connections (HTTPS); access tokens are kept server-side
+with restricted access. We keep your data while your account is active. Disconnecting a channel deletes its access
+tokens; on request we delete your account and its data within 30 days.</p>
+<h2>Your choices</h2>
+<p>You can edit or delete your content, disconnect channels and AI apps from inside Shipcast, and ask us to export
+or delete your data. Shipcast is not intended for children under 13.</p>
+<h2>Changes and contact</h2>
+<p>We will update the date above when this policy changes. Questions or requests: {contact_line()}.</p>
+<p class=mute><a href="{P}/terms">Terms of Service</a></p></div>""")
+
+
+@mcp.custom_route("/terms", methods=["GET"])
+async def terms(req: Request):
+    return page("Terms of Service", f"""<div class=card>
+<p class=mute>Effective {LEGAL_DATE}. These terms apply to your use of Shipcast ({e(STUDIO)}). By creating an
+account you agree to them.</p>
+<h2>The service</h2>
+<p>Shipcast lets you plan, create, schedule and publish content to social platforms you connect, and connect AI
+assistants that act in your workspace on your behalf.</p>
+<h2>Your account</h2>
+<p>Keep your login secure; you are responsible for activity in your account and workspace, including actions an AI
+app you connected takes there. Review anything an AI app prepares before you approve publishing it.</p>
+<h2>Your content and platform rules</h2>
+<p>You own your content and give us permission to store and process it only to run the service for you. You are
+responsible for what you publish and must follow each platform's terms, including the
+<a href="https://www.youtube.com/t/terms" target=_blank>YouTube Terms of Service</a> when you connect YouTube. Do not
+use Shipcast for spam, harassment, illegal content or to break any platform's rules.</p>
+<h2>Availability</h2>
+<p>The service is provided "as is", without warranties. Platforms can change or limit their APIs, which can affect
+features. To the extent the law allows, we are not liable for indirect or consequential losses, or for content
+published through your account.</p>
+<h2>Ending your use</h2>
+<p>You can stop using Shipcast and ask us to delete your account at any time. We may suspend accounts that break
+these terms.</p>
+<h2>Changes and contact</h2>
+<p>We may update these terms and will change the date above when we do. Questions: {contact_line()}.</p>
+<p class=mute><a href="{P}/privacy">Privacy Policy</a></p></div>""")
+
+
 @mcp.custom_route("/oauth/consent", methods=["GET", "POST"])
 async def consent(req: Request):
     """An app asked for access (via /authorize). A workspace admin, logged in to Studio, allows or denies it."""

@@ -223,6 +223,10 @@ try:
     st, h, _ = req(C + "/oauth/consent", {"req": rid, "deny": "1"}, who="bob")
     assert st == 303 and "error=access_denied" in h["location"]
 
+    for path in ("/privacy", "/terms"):  # public legal pages: no login, Google's required statements
+        st, _, body = req(C + path)
+        assert st == 200 and "Log in to Shipcast" not in body and "youtube.com/t/terms" in body, path
+    assert "Limited Use" in req(C + "/privacy")[2]
     for path in ("/", "/brand", "/kits", "/platforms"):  # brand: Shipcast everywhere, no upstream name
         body = req(C + path, who="owner")[2]
         assert "shipcast" in body and "Postiz" not in body, path
