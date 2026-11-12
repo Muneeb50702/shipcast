@@ -96,7 +96,7 @@ Shipcast must be offered this source. `control/` is separate code that talks to 
 
 ## Open items
 
-- Platform developer apps: YouTube needs its OAuth client (Google Cloud project "My First Project" has the
+- Platform developer apps: YouTube needs its OAuth client (Google Cloud project "Shipcast" has the
   YouTube Data + Analytics APIs on); Meta, LinkedIn, TikTok, Pinterest need their app reviews for customers.
 - Privacy policy and terms pages (needed by Google, Meta and TikTok reviews).
 - Email verification and billing before opening to the public at scale.
