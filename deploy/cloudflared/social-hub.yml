@@ -1,0 +1,10 @@
+tunnel: b1b30578-44ee-4c93-a2eb-422d4e05ec27
+credentials-file: /etc/cloudflared/social-hub.json
+ingress:
+  # Shipcast Control (the Claude side) lives on the Studio site under /control, plus its OAuth discovery documents
+  - hostname: social.muhammadmuneeb.tech
+    path: ^/(control(/.*)?|\.well-known/oauth-(protected-resource|authorization-server)/control(/.*)?)$
+    service: http://127.0.0.1:4010
+  - hostname: social.muhammadmuneeb.tech
+    service: http://127.0.0.1:4007
+  - service: http_status:404

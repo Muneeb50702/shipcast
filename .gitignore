@@ -1,0 +1,16 @@
+# secrets and runtime data: never commit
+.env
+*.env
+!*.env.example
+*.db
+*.db-wal
+*.db-shm
+deploy/cloudflared/*.json
+cert.pem
+*.pem
+
+# local tooling
+.venv/
+__pycache__/
+*.pyc
+node_modules/

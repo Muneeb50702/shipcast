@@ -1,0 +1,19 @@
+[Unit]
+Description=Shipcast Control (Claude side of Studio, served at /control) on 127.0.0.1:4010
+After=network-online.target docker.service
+
+[Service]
+User=hub
+Group=hub
+WorkingDirectory=/opt/hub
+ExecStart=/opt/hub/.venv/bin/python /opt/hub/app.py
+Restart=always
+RestartSec=2
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/hub /opt/postiz/keys.env
+
+[Install]
+WantedBy=multi-user.target

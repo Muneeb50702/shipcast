@@ -1,0 +1,12 @@
+[Unit]
+Description=Cloudflare Tunnel: social.muhammadmuneeb.tech (Studio; /control -> Shipcast Control)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+ExecStart=/usr/bin/cloudflared --no-autoupdate --config /etc/cloudflared/social-hub.yml tunnel run
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

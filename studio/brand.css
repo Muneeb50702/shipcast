@@ -1,0 +1,18 @@
+
+/* ---- Shipcast brand layer (served as /shipcast.css, imported by every stylesheet; see rebrand.sh) ---- */
+/* upstream draws its logos as inline SVGs: hide their paths, paint the Shipcast files instead */
+svg[viewBox="0 0 101 33"]{width:176px!important;height:40px!important;background:url(/shipcast-text.svg) left center/contain no-repeat!important}
+svg[viewBox="0 0 101 33"]>*{display:none!important}
+svg.min-w-\[60px\][viewBox="0 0 60 60"]{background:url(/shipcast-mark.svg) center/78% no-repeat!important}
+svg.min-w-\[60px\][viewBox="0 0 60 60"]>*{display:none!important}
+/* links to the upstream product's own sites are rewritten to #shipcast-hidden (brand.js): hide them, and the
+   sign-up "you agree to our terms / privacy" line that only held such links */
+a[href$="#shipcast-hidden"]{display:none!important}
+.text-\[12px\]:has(>a[href$="#shipcast-hidden"]){display:none!important}
+/* sign-up side panel: its user counts and testimonials belong to upstream, not us, so show the tagline instead */
+.text-\[36px\].pt-\[88px\]>*{display:none!important}
+.text-\[36px\].pt-\[88px\]{justify-content:center!important;gap:28px;border-radius:12px;
+  background:radial-gradient(640px 420px at 50% 38%,rgba(255,90,31,.20),transparent 70%),#121212!important}
+.text-\[36px\].pt-\[88px\]::before{content:"";width:120px;height:120px;background:url(/shipcast-mark.svg) center/contain no-repeat}
+.text-\[36px\].pt-\[88px\]::after{content:"Stop posting.\A Start shipping.";white-space:pre;text-align:center;
+  font-weight:800;font-size:46px;line-height:1.08;letter-spacing:-1px;color:#fff}

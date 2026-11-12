@@ -1,0 +1,7 @@
+[Unit]
+Description=Recreate the Postiz container with new platform keys
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/postiz
+ExecStart=/usr/bin/docker compose up -d postiz

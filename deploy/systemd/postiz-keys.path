@@ -1,0 +1,8 @@
+[Unit]
+Description=Recreate Studio when Shipcast Control saves platform keys
+
+[Path]
+PathChanged=/opt/postiz/keys.env
+
+[Install]
+WantedBy=multi-user.target
