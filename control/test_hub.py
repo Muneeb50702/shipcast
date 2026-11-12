@@ -169,6 +169,10 @@ try:
     keys = open(f"{tmp}/keys.env").read()
     assert "FACEBOOK_APP_ID='123'" in keys and "HIDDEN_PROVIDERS" not in keys, keys
     assert "no spaces" in req(C + "/platforms", {"platform": "facebook", "FACEBOOK_APP_ID": "a b"}, who="owner")[2]
+    assert "Saved farcaster" in req(C + "/platforms", {"platform": "farcaster", "NEYNAR_APP_MNEMONIC": "apple bird cat"},
+                                    who="owner")[2] and "NEYNAR_APP_MNEMONIC='apple bird cat'" in open(f"{tmp}/keys.env").read()
+    assert "single spaces" in req(C + "/platforms", {"platform": "farcaster", "NEYNAR_APP_MNEMONIC": "a  'b"}, who="owner")[2]
+    assert "X_API_KEY" in req(C + "/platforms", who="owner")[2]
 
     # ---- OAuth discovery at the site root (what the tunnel routes here)
     prm = req(BASE + "/.well-known/oauth-protected-resource/control/mcp")[2]

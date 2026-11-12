@@ -205,12 +205,22 @@ PLATFORMS = {
     "whop": ("Whop", ["WHOP_CLIENT_ID"], [], "https://whop.com/dashboard/developer", ["whop"], "Whop developer app."),
     "mewe": ("MeWe", ["MEWE_APP_ID", "MEWE_API_KEY", "MEWE_HOST"], [], "https://mewe.com/business", ["mewe"],
              "MeWe partner API access (by request)."),
+    "x": ("X (Twitter)", ["X_API_KEY", "X_API_SECRET"], [], "https://developer.x.com/en/portal/dashboard", ["x"],
+          "X developer app, OAuth 1.0a with Read and write; callback URL below. Posting volume depends on your X "
+          "API plan (free tier is very limited)."),
+    "farcaster": ("Farcaster (via Neynar)", ["NEYNAR_CLIENT_ID", "NEYNAR_SECRET_KEY", "NEYNAR_APP_FID",
+                                             "NEYNAR_APP_MNEMONIC"], ["NEYNAR_SPONSOR_SIGNERS"],
+                  "https://dev.neynar.com/app", ["wrapcast"],
+                  "Neynar app (client ID + API key) plus your app's Farcaster account FID and its recovery phrase "
+                  "(12/24 words, spaces allowed); NEYNAR_SPONSOR_SIGNERS=true to pay signer fees for users."),
     "gmb": ("Google Business Profile", ["GOOGLE_GMB_CLIENT_ID", "GOOGLE_GMB_CLIENT_SECRET"], [],
             "https://console.cloud.google.com/auth/clients", ["gmb"],
             "Needs Google's Business Profile API access approval first; then a Web OAuth client like YouTube's."),
 }
 ALL_VARS = {v for p in PLATFORMS.values() for v in p[1] + p[2]}
 SAFE_VALUE = re.compile(r"^[^\s'\\]*$")  # values are written single-quoted, so compose never interpolates them
+SPACED_VALUE = re.compile(r"^[a-z]+( [a-z]+)*$")  # recovery phrases: lowercase words, single spaces
+SPACED_VARS = {"NEYNAR_APP_MNEMONIC"}
 
 
 
@@ -231,8 +241,9 @@ def write_keys(updates: dict, org: str | None, actor: str):
     for k, v in updates.items():
         if k not in ALL_VARS:
             raise ValueError(f"unknown key {k}")
-        if not SAFE_VALUE.match(v):
-            raise ValueError(f"{k}: no spaces, quotes or backslashes")
+        if not (SPACED_VALUE.match(v) if k in SPACED_VARS else SAFE_VALUE.match(v)):
+            raise ValueError(f"{k}: words separated by single spaces" if k in SPACED_VARS
+                             else f"{k}: no spaces, quotes or backslashes")
     keys = read_keys() | updates
     with open(KEYS_FILE, "w") as f:
         f.write("# written by Shipcast Control; every save restarts Studio\n")
