@@ -14,3 +14,6 @@ cert.pem
 __pycache__/
 *.pyc
 node_modules/
+
+# OAuth client downloads (Google etc.)
+client_secret*.json
