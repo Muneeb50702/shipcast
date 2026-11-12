@@ -18,7 +18,7 @@ Live: **https://social.muhammadmuneeb.tech** (one site, one login).
    - Claude page (inside Studio)           - accounts, workspaces, channels,
    - MCP server /control/mcp (OAuth)         calendar, posting, media
    - brand profile + kits per workspace    - its own MCP (proxied by Control)
-   - Platforms: server developer keys  --> /opt/postiz/keys.env (+ HIDDEN_PROVIDERS)
+   - Platforms: server developer keys  --> /opt/postiz/keys.env
 ```
 
 - **Studio** is [Postiz](https://github.com/gitroomhq/postiz-app) (AGPL-3.0), rebranded at image build time by
@@ -30,8 +30,8 @@ Live: **https://social.muhammadmuneeb.tech** (one site, one login).
   (OAuth DCR) and a workspace admin clicks Allow while logged in. Tools are scoped to that workspace; Studio's own
   MCP tools are proxied as `studio_*` with that workspace's API key, so a customer's Claude only sees their data.
 - **Platform developer keys** (YouTube, Meta, LinkedIn, ...) are one set for the whole server, managed on the
-  Platforms tab by Studio super admins. Control keeps Studio's `HIDDEN_PROVIDERS` in sync, so "Add channel" only
-  lists platforms whose keys are complete (plus keyless ones such as Bluesky).
+  Platforms tab (or Claude's `set_platform_keys` tool) by Studio super admins. Studio lists every platform; one
+  connects once its keys are saved (keyless ones such as Bluesky work right away).
 
 ## Repo layout -> server
 

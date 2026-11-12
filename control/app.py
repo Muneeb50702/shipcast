@@ -209,19 +209,9 @@ PLATFORMS = {
             "https://console.cloud.google.com/auth/clients", ["gmb"],
             "Needs Google's Business Profile API access approval first; then a Web OAuth client like YouTube's."),
 }
-NEVER_SHOW = ["x", "skool", "wrapcast"]  # paid API / needs upstream's browser extension / not supported here
 ALL_VARS = {v for p in PLATFORMS.values() for v in p[1] + p[2]}
 SAFE_VALUE = re.compile(r"^[^\s'\\]*$")  # values are written single-quoted, so compose never interpolates them
 
-
-def hidden_providers(keys: dict) -> str:
-    """Studio's HIDDEN_PROVIDERS: never-shown providers plus every provider whose server keys are incomplete,
-    so 'Add channel' only lists platforms that can actually connect."""
-    hide = set(NEVER_SHOW)
-    for label, req, opt, console, providers, notes in PLATFORMS.values():
-        if not all(keys.get(v) for v in req):
-            hide |= set(providers)
-    return ",".join(sorted(hide))
 
 
 def read_keys():
@@ -237,26 +227,19 @@ def read_keys():
 
 
 def write_keys(updates: dict, org: str | None, actor: str):
-    """Merge updates into Studio's keys.env (+ recompute HIDDEN_PROVIDERS). Saving it makes systemd
-    (postiz-keys.path) restart Studio."""
+    """Merge updates into Studio's keys.env. Saving it makes systemd (postiz-keys.path) restart Studio."""
     for k, v in updates.items():
         if k not in ALL_VARS:
             raise ValueError(f"unknown key {k}")
         if not SAFE_VALUE.match(v):
             raise ValueError(f"{k}: no spaces, quotes or backslashes")
     keys = read_keys() | updates
-    keys["HIDDEN_PROVIDERS"] = hidden_providers(keys)
     with open(KEYS_FILE, "w") as f:
         f.write("# written by Shipcast Control; every save restarts Studio\n")
         f.writelines(f"{k}='{v}'\n" for k, v in sorted(keys.items()) if v)
     if updates:
         log(org, actor, "platform keys saved: " + ", ".join(sorted(updates)))
 
-
-def sync_hidden_providers():
-    """At start: make Studio's platform list match the configured keys (one Studio restart if it changed)."""
-    if read_keys().get("HIDDEN_PROVIDERS") != hidden_providers(read_keys()):
-        write_keys({}, None, "control")
 
 
 def platform_rows():
@@ -304,7 +287,8 @@ def setup_status(org):
     ready = [p["id"] for p in platform_rows() if p["configured"]]
     return {"ready_for_generation": nxt is None, "next_step": nxt, "steps": steps,
             "platforms_with_server_keys": ready,
-            "note": "Studio only lists platforms that can connect: keyless ones (Bluesky, WordPress, Medium, Dev.to, Hashnode, Lemmy, Nostr, Listmonk) plus those with server keys above."}
+            "note": "Studio lists every platform; ones in platforms_with_server_keys (and keyless ones like Bluesky, "
+                    "WordPress, Medium, Dev.to, Hashnode, Lemmy, Nostr, Listmonk) can connect now."}
 
 
 # ------------------------------------------------------------------ OAuth for MCP apps
@@ -431,7 +415,6 @@ class ShipcastAuth(OAuthProvider):
                 grant_drop(d["grant"])
 
 
-sync_hidden_providers()
 AUTH = ShipcastAuth()
 mcp = FastMCP("shipcast", auth=AUTH, instructions="""
 Shipcast: this workspace's control center for its social accounts. Always call setup_status first and work on its next_step:
@@ -762,10 +745,10 @@ async def platforms_page(req: Request, user: dict):
           <button>Save</button> <button class=ghost name=clear value=1>Clear</button></form>""")
     shown = [p["label"] for p in platform_rows() if p["configured"]]
     note = ("<p class=mute>Server-wide developer apps: every workspace connects its own accounts through them. Only "
-            "Shipcast owners see this page. A platform appears in Studio's 'Add channel' list once all its required "
-            "keys are set; saving restarts Studio for everyone (~1 min). Keyless platforms (Bluesky, WordPress, "
-            "Medium, Dev.to, Hashnode, Lemmy, Nostr, Listmonk) are always listed; X is left out (paid API).</p>"
-            f"<p>Listed in Studio now: <b>{e(', '.join(shown) or 'keyless platforms only')}</b></p>")
+            "Shipcast owners see this page. Studio lists every platform; one connects once all its required keys are "
+            "set here. Saving restarts Studio for everyone (~1 min). Keyless platforms (Bluesky, WordPress, Medium, "
+            "Dev.to, Hashnode, Lemmy, Nostr, Listmonk) work without keys.</p>"
+            f"<p>Ready to connect: <b>{e(', '.join(shown) or 'keyless platforms only')}</b></p>")
     return page("Platforms", note + "".join(cards), user, "/platforms", flash)
 
 

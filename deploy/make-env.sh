@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Runs ON the server: writes /opt/postiz/.env with fresh random secrets, only if it doesn't exist yet.
 # Usage: sudo bash make-env.sh [domain]      (default: social.muhammadmuneeb.tech)
-# Platform developer keys do NOT go here: Shipcast Control writes them to /opt/postiz/keys.env (with
-# HIDDEN_PROVIDERS), and docker-compose loads both files.
+# Platform developer keys do NOT go here: Shipcast Control writes them to /opt/postiz/keys.env, and
+# docker-compose loads both files.
 set -euo pipefail
 DOMAIN="${1:-social.muhammadmuneeb.tech}"
 cd /opt/postiz

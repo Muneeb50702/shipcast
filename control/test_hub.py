@@ -151,9 +151,6 @@ try:
             pass
         time.sleep(0.25)
 
-    # ---- at start Control hides every platform without server keys from Studio's 'Add channel' list
-    first = open(f"{tmp}/keys.env").read()
-    assert "youtube" in first and "facebook" in first and "bluesky" not in first, first
     # ---- UI: Studio login is the only way in
     assert "Log in to Shipcast" in req(C + "/")[2]
     assert "Workspace admins only" in req(C + "/", who="mia")[2]
@@ -170,10 +167,7 @@ try:
     assert "Saved facebook" in req(C + "/platforms", {"platform": "facebook", "FACEBOOK_APP_ID": "123",
                                                       "FACEBOOK_APP_SECRET": "abc"}, who="owner")[2]
     keys = open(f"{tmp}/keys.env").read()
-    hidden = re.search(r"HIDDEN_PROVIDERS='([^']*)'", keys).group(1).split(",")
-    assert "FACEBOOK_APP_ID='123'" in keys and "facebook" not in hidden and "instagram" not in hidden, keys
-    assert {"x", "skool", "youtube", "linkedin", "tiktok", "telegram"} <= set(hidden), hidden  # no keys -> not offered
-    assert "bluesky" not in hidden
+    assert "FACEBOOK_APP_ID='123'" in keys and "HIDDEN_PROVIDERS" not in keys, keys
     assert "no spaces" in req(C + "/platforms", {"platform": "facebook", "FACEBOOK_APP_ID": "a b"}, who="owner")[2]
 
     # ---- OAuth discovery at the site root (what the tunnel routes here)
