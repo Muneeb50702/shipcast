@@ -36,6 +36,8 @@ STORAGE_PROVIDER=local
 UPLOAD_DIRECTORY=/uploads
 NEXT_PUBLIC_UPLOAD_DIRECTORY=/uploads
 MASTODON_URL=https://mastodon.social
+# Meta no longer offers Instagram Login to new apps; Instagram connects through Facebook instead
+HIDDEN_PROVIDERS=instagram-standalone
 EOF
 [ -e keys.env ] || { : > keys.env; chown hub:hub keys.env 2>/dev/null || true; chmod 600 keys.env; }
 echo "wrote /opt/postiz/.env (mode 600)"

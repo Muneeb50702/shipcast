@@ -164,9 +164,6 @@ PLATFORMS = {
                  "https://developers.facebook.com/apps", ["facebook", "instagram"],
                  "Meta app (Business type): Facebook Login for Business + Instagram Graph API; add the redirect URIs "
                  "under Facebook Login settings. Other people's accounts need Meta App Review."),
-    "instagram": ("Instagram (Instagram login, no Facebook page)", ["INSTAGRAM_APP_ID", "INSTAGRAM_APP_SECRET"], [],
-                  "https://developers.facebook.com/apps", ["instagram-standalone"],
-                  "Meta app with the 'Instagram API with Instagram Login' product; use its Instagram app ID/secret."),
     "threads": ("Threads", ["THREADS_APP_ID", "THREADS_APP_SECRET"], [], "https://developers.facebook.com/apps",
                 ["threads"], "Meta app with the 'Access the Threads API' use case; use the Threads app ID/secret."),
     "linkedin": ("LinkedIn (profiles + pages)", ["LINKEDIN_CLIENT_ID", "LINKEDIN_CLIENT_SECRET"], [],
